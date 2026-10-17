@@ -333,3 +333,12 @@ tr:hover td{background:rgba(0,240,255,.05)}
   #who{display:none}
   .narrow{margin-top:28px}
 }
+
+/* ---------- select dropdown ---------- */
+select{
+  width:100%;margin-top:6px;padding:11px 13px;font-size:1rem;color:var(--text);
+  background:rgba(5,8,20,.7);border:1px solid var(--line);border-radius:10px;outline:none;
+  font-family:var(--font-body);transition:border-color .2s,box-shadow .2s;
+}
+select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,240,255,.15),0 0 16px rgba(0,240,255,.35)}
+option{background:#0b1022;color:var(--text)}

@@ -61,9 +61,23 @@
         <label>Months<input id="ln-months" type="number" min="3" max="36" value="12"></label>
         <button id="ln-btn">Take loan</button>
       </div>
+      <p id="emi-preview" class="muted"></p>
       <p><button id="pay-emi" class="hidden">Pay next EMI</button></p>
     </div>
-    <div class="card"><h2>Recent transactions</h2><div class="wrap" id="txns"></div></div>
+    <div class="card"><h2>Recent transactions</h2>
+      <div class="row">
+        <label>Filter
+          <select id="txn-filter">
+            <option value="ALL">All transactions</option>
+            <option value="DEPOSIT">Deposits</option>
+            <option value="WITHDRAW">Withdrawals</option>
+            <option value="TRANSFER">Transfers</option>
+            <option value="LOAN">Loans and EMI</option>
+          </select>
+        </label>
+        <button id="csv-btn" class="ghost">Download CSV</button>
+      </div>
+      <div class="wrap" id="txns"></div></div>
   </section>
 
   <section id="admin" class="hidden">

@@ -101,7 +101,8 @@ async function loadCustomer() {
         `<td>${day(l.next_due_date)}</td><td>${badge(l.status)}</td></tr>`).join('') + '</table>'
     : '<p class="muted">No loans.</p>';
   show('pay-emi', loans.some(l => l.status !== 'CLOSED'));
-  renderTxns(txns, 'txns');
+  allTxns = txns;
+  applyFilter();
 }
 
 async function act(fn, okText) {
@@ -128,7 +129,7 @@ $('tr-btn').onclick = () => act(async () => {
 }, 'Transfer successful');
 $('ln-btn').onclick = () => act(async () => {
   await api('/api/customer/loans', 'POST', {amount: positive('ln-amt'), months: Number($('ln-months').value)});
-  $('ln-amt').value = '';
+  $('ln-amt').value = ''; emiPreview();
 }, 'Loan credited to your account');
 $('pay-emi').onclick = () => act(() => api('/api/customer/loans/pay-emi', 'POST'), 'EMI paid');
 
@@ -169,5 +170,49 @@ $('n-btn').onclick = async () => {
     await refresh();
   } catch (e) { msg(e.message, false); }
 };
+
+// ---------- filter, CSV statement, EMI preview ----------
+let allTxns = [];
+const FILTERS = {
+  ALL: null,
+  DEPOSIT: ['DEPOSIT'],
+  WITHDRAW: ['WITHDRAW'],
+  TRANSFER: ['TRANSFER_IN', 'TRANSFER_OUT'],
+  LOAN: ['LOAN_CREDIT', 'EMI_PAID']
+};
+function filtered() {
+  const types = FILTERS[$('txn-filter').value];
+  return types ? allTxns.filter(t => types.includes(t.txn_type)) : allTxns;
+}
+function applyFilter() { renderTxns(filtered(), 'txns'); }
+$('txn-filter').onchange = applyFilter;
+
+function csvCell(v) {
+  let s = String(v ?? '');
+  if (/^[=+\-@]/.test(s)) s = "'" + s;   // stop spreadsheet formula injection
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+$('csv-btn').onclick = () => {
+  const rows = filtered();
+  if (!rows.length) return msg('No transactions to download', false);
+  const lines = ['Date,Type,Amount,Details'].concat(rows.map(t =>
+    [dt(t.txn_time), t.txn_type, t.amount, t.description].map(csvCell).join(',')));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines.join('\n')], {type: 'text/csv'}));
+  a.download = 'statement.csv';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
+function emiPreview() {
+  const p = Number($('ln-amt').value), n = Number($('ln-months').value);
+  const el = $('emi-preview');
+  if (!(p > 0) || !(n >= 3 && n <= 36)) { el.textContent = ''; return; }
+  const r = 12 / 12 / 100;                       // 12% p.a., same as the bank's loan rate
+  const emi = p * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  el.textContent = 'Estimated EMI: ' + money(emi) + ' per month, total repayment ' + money(emi * n);
+}
+$('ln-amt').oninput = emiPreview;
+$('ln-months').oninput = emiPreview;
 
 start().catch(e => msg(e.message, false));
