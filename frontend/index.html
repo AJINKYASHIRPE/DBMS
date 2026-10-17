@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secure Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topbar" class="hidden">
+  <h1>Secure Bank</h1>
+  <div><span id="who"></span> <button id="logout" class="ghost">Logout</button></div>
+</header>
+<main>
+  <div id="msg" class="msg hidden"></div>
+
+  <section id="login" class="card narrow">
+    <h2>Sign in</h2>
+    <div class="tabs">
+      <button id="tab-customer" class="tab active">Customer</button>
+      <button id="tab-admin" class="tab">Admin</button>
+    </div>
+    <div id="form-customer">
+      <label>Account number<input id="c-acc" inputmode="numeric" autocomplete="username"></label>
+      <label>PIN<input id="c-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password"></label>
+      <button id="c-login">Sign in</button>
+    </div>
+    <div id="form-admin" class="hidden">
+      <label>Username<input id="a-user" autocomplete="username"></label>
+      <label>Password<input id="a-pass" type="password" autocomplete="current-password"></label>
+      <button id="a-login">Sign in</button>
+    </div>
+  </section>
+
+  <section id="customer" class="hidden">
+    <div class="card">
+      <div class="muted">Available balance</div>
+      <div id="balance" class="balance"></div>
+      <div id="c-since" class="muted"></div>
+    </div>
+    <div class="grid">
+      <div class="card"><h2>Deposit</h2>
+        <label>Amount (₹)<input id="dep-amt" type="number" min="1" step="0.01"></label>
+        <button id="dep-btn">Deposit</button></div>
+      <div class="card"><h2>Withdraw</h2>
+        <label>Amount (₹)<input id="wd-amt" type="number" min="1" step="0.01"></label>
+        <button id="wd-btn">Withdraw</button></div>
+      <div class="card"><h2>Transfer</h2>
+        <label>To account<input id="tr-acc" inputmode="numeric"></label>
+        <label>Amount (₹)<input id="tr-amt" type="number" min="1" step="0.01"></label>
+        <button id="tr-btn">Transfer</button></div>
+    </div>
+    <div class="card">
+      <h2>Loans</h2>
+      <div class="wrap" id="loans"></div>
+      <p class="muted">Interest 12% p.a. Up to ₹10,00,000 for 3 to 36 months. One active loan at a time.</p>
+      <div class="row">
+        <label>Loan amount (₹)<input id="ln-amt" type="number" min="1" step="1"></label>
+        <label>Months<input id="ln-months" type="number" min="3" max="36" value="12"></label>
+        <button id="ln-btn">Take loan</button>
+      </div>
+      <p><button id="pay-emi" class="hidden">Pay next EMI</button></p>
+    </div>
+    <div class="card"><h2>Recent transactions</h2><div class="wrap" id="txns"></div></div>
+  </section>
+
+  <section id="admin" class="hidden">
+    <div class="card"><h2>Create account</h2>
+      <div class="row">
+        <label>Name<input id="n-name"></label>
+        <label>4-digit PIN<input id="n-pin" type="password" inputmode="numeric" maxlength="4"></label>
+        <label>Opening deposit (₹)<input id="n-amt" type="number" min="0" step="0.01" value="0"></label>
+        <button id="n-btn">Create</button>
+      </div>
+    </div>
+    <div class="card"><h2>Accounts</h2><div class="wrap" id="accounts"></div></div>
+    <div class="card hidden" id="acc-panel"><h2 id="acc-title"></h2><div class="wrap" id="acc-txns"></div></div>
+    <div class="card"><h2>All loans</h2><div class="wrap" id="admin-loans"></div></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
