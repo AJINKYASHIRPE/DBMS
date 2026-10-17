@@ -89,11 +89,21 @@
         <button id="n-btn">Create</button>
       </div>
     </div>
-    <div class="card"><h2>Accounts</h2><div class="wrap" id="accounts"></div></div>
+    <div class="card"><h2>Reset customer PIN</h2>
+      <div class="row">
+        <label>Account number<input id="rp-acc" inputmode="numeric"></label>
+        <label>New 4-digit PIN<input id="rp-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password"></label>
+        <button id="rp-btn">Reset PIN</button>
+      </div>
+    </div>
+    <div class="card"><h2>Accounts</h2>
+      <label>Search by name or account number<input id="acc-search" placeholder="Type to filter..."></label>
+      <div class="wrap" id="accounts"></div></div>
     <div class="card hidden" id="acc-panel"><h2 id="acc-title"></h2><div class="wrap" id="acc-txns"></div></div>
     <div class="card"><h2>All loans</h2><div class="wrap" id="admin-loans"></div></div>
   </section>
 </main>
+<script src="config.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

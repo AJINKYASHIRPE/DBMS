@@ -1,5 +1,6 @@
 package com.bank.backend;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,20 @@ public class AdminController {
                 "SELECT txn_id, txn_type, amount, other_account, description, txn_time " +
                 "FROM transactions WHERE account_no = ? ORDER BY txn_time DESC, txn_id DESC",
                 accountNo);
+    }
+
+    record PinReset(String pin) {}
+
+    @PostMapping("/accounts/{accountNo}/reset-pin")
+    public ResponseEntity<Map<String, String>> resetPin(@PathVariable String accountNo,
+                                                        @RequestBody PinReset r) {
+        if (r.pin() == null || !r.pin().matches("[0-9]{4}"))
+            return ResponseEntity.badRequest().body(Map.of("error", "PIN must be exactly 4 digits"));
+        int n = jdbc.update("UPDATE accounts SET pin_hash = SHA2(?, 256) WHERE account_no = ?",
+                r.pin(), accountNo);
+        if (n == 0)
+            return ResponseEntity.status(404).body(Map.of("error", "Account not found"));
+        return ResponseEntity.ok(Map.of("status", "PIN updated"));
     }
 
     @GetMapping("/loans")

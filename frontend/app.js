@@ -1,7 +1,7 @@
 // In Codespaces the page is on port 5500 and the API on 8080 of the same host.
-const API = location.hostname.endsWith('.app.github.dev')
+const API = window.API_BASE || (location.hostname.endsWith('.app.github.dev')
   ? location.origin.replace(/-\d+(\.app\.github\.dev)$/, '-8080$1')
-  : 'http://localhost:8080';
+  : 'http://localhost:8080');
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -142,6 +142,7 @@ async function loadAdmin() {
     accs.map(a => `<tr><td>${esc(a.account_no)}</td><td>${esc(a.name)}</td><td>${money(a.balance)}</td>` +
       `<td>${day(a.created_at)}</td><td><button class="small" data-acc="${esc(a.account_no)}">Transactions</button></td></tr>`).join('') +
     '</table>';
+  filterAccounts();
   $('admin-loans').innerHTML = loans.length
     ? '<table><tr><th>Customer</th><th>Account</th><th>Loan</th><th>Amount</th><th>EMI</th><th>Paid</th><th>Outstanding</th><th>Status</th></tr>' +
       loans.map(l => `<tr><td>${esc(l.name)}</td><td>${esc(l.account_no)}</td><td>#${esc(l.loan_id)}</td>` +
@@ -214,5 +215,27 @@ function emiPreview() {
 }
 $('ln-amt').oninput = emiPreview;
 $('ln-months').oninput = emiPreview;
+
+// ---------- admin: search and PIN reset ----------
+function filterAccounts() {
+  const q = $('acc-search').value.trim().toLowerCase();
+  document.querySelectorAll('#accounts tr').forEach((tr, i) => {
+    if (i === 0) return;   // header row
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+$('acc-search').oninput = filterAccounts;
+
+$('rp-btn').onclick = async () => {
+  try {
+    const acc = $('rp-acc').value.trim();
+    const pin = $('rp-pin').value;
+    if (!acc) throw new Error('Enter the account number');
+    if (!/^[0-9]{4}$/.test(pin)) throw new Error('PIN must be exactly 4 digits');
+    await api('/api/admin/accounts/' + encodeURIComponent(acc) + '/reset-pin', 'POST', {pin});
+    msg('PIN updated for account ' + acc, true);
+    $('rp-acc').value = ''; $('rp-pin').value = '';
+  } catch (e) { msg(e.message, false); }
+};
 
 start().catch(e => msg(e.message, false));
